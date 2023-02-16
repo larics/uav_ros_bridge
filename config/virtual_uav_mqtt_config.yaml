@@ -1,0 +1,16 @@
+mqtt:
+  client:
+    protocol: 4      # MQTTv311
+  connection:
+    host: localhost
+    port: 1883
+    keepalive: 60
+  private_path: device/001
+serializer: json:dumps
+deserializer: json:loads
+bridge:
+  # Uav state -> to HMI
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: uav_ros_bridge.msg:UavState
+    topic_from: /red/mqtt/state # Ros topic
+    topic_to: red/state # mqtt topic

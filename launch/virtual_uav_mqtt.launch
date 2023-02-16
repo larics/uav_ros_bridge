@@ -1,0 +1,19 @@
+<launch>
+  <arg name="namespace" default="red"/>
+
+  <group ns="red">
+    <node name="mqtt_bridge" pkg="mqtt_bridge" type="mqtt_bridge_node.py" output="screen">
+      <rosparam command="load" file="$(find uav_ros_bridge)/config/virtual_uav_mqtt_config.yaml" />
+    </node>
+
+    <node name="generate_uav_state" pkg="uav_ros_bridge" type="generate_uav_state.py" output="screen">
+      <param name="rate" value="20"/>
+      <param name="voltage/min" value="21.3"/>
+      <param name="voltage/max" value="25.2"/>
+      <remap from="generate_uav_state/uav_state" to="mqtt/state"/>
+      <remap from="generate_uav_state/odometry" to="es_ekf/odom"/>
+      <remap from="generate_uav_state/imu" to="mavros/imu/data"/>
+      <remap from="generate_uav_state/battery_state" to="mavros/battery"/>
+    </node>
+  </group>
+</launch>
