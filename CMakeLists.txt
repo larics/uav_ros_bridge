@@ -8,17 +8,28 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   trajectory_msgs
   nav_msgs
+  sensor_msgs
+  cmake_modules
+  message_generation
 )
 
-#add_message_files(
-#  FILES
-#  file.msg
-#)
+add_message_files(
+  FILES
+  UavState.msg
+)
 
 #add_service_files(
 #  FILES
 #  file.srv
 #)
+
+generate_messages(
+  DEPENDENCIES 
+  std_msgs
+  geometry_msgs 
+  trajectory_msgs
+  nav_msgs
+  sensor_msgs)
 
 catkin_package(
   INCLUDE_DIRS
