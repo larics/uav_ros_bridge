@@ -1,9 +1,18 @@
 <launch>
-  <arg name="namespace" default="red"/>
+  <arg name="namespace" default="$(env UAV_NAMESPACE)"/>
+  <arg name="mqtt_config_file" default="$(find uav_ros_bridge)/config/virtual_uav_mqtt_config.yaml"/>
 
-  <group ns="red">
-    <node name="mqtt_bridge" pkg="mqtt_bridge" type="mqtt_bridge_node.py" output="screen">
-      <rosparam command="load" file="$(find uav_ros_bridge)/config/virtual_uav_mqtt_config.yaml" />
+  <!-- The problem is with rosparam command that does not support environment
+  variables in yaml files. The workaround creating copying the config file to .config.yaml and replacing string pattern "uav_unique_ns" with the 
+  UAV_NAMESPACE environment variable.
+
+  This script also load the rosparam. The reason is the rosparam below is loaded before the node is executed (setting the file for rosparam) so the
+  old .config.yaml file is loaded. -->
+  <node name="setup_mqtt_config_file" pkg="uav_ros_bridge" type="setup_mqtt_config_file.sh" output="screen" args="$(arg mqtt_config_file)"/>
+
+  <group ns="$(arg namespace)">
+    <node name="mqtt_bridge" pkg="mqtt_bridge" type="mqtt_bridge_node.py" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'; ">
+      <!--rosparam command="load" file="$(find uav_ros_bridge)/config/.config.yaml"/-->
     </node>
 
     <node name="generate_uav_state" pkg="uav_ros_bridge" type="generate_uav_state.py" output="screen">

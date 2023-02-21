@@ -12,5 +12,15 @@ bridge:
   # Uav state -> to HMI
   - factory: mqtt_bridge.bridge:RosToMqttBridge
     msg_type: uav_ros_bridge.msg:UavState
-    topic_from: /red/mqtt/state # Ros topic
-    topic_to: red/state # mqtt topic
+    topic_from: mqtt/state # Ros topic
+    topic_to: uav_unique_namespace/state # mqtt topic
+  # Takeoff HMI --> UAV
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:Bool
+    topic_from: uav_unique_namespace/takeoff # mqtt topic
+    topic_to: takeoff # Ros topic
+  # Land HMI --> UAV
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:Bool
+    topic_from: uav_unique_namespace/land # mqtt topic
+    topic_to: land # Ros topic
