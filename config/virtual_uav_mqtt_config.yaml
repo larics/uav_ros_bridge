@@ -24,3 +24,8 @@ bridge:
     msg_type: std_msgs.msg:Bool
     topic_from: uav_unique_namespace/land # mqtt topic
     topic_to: land # Ros topic
+  # Waypoints message (mission)
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: uav_ros_msgs.msg:Waypoints
+    topic_from: uav_unique_namespace/waypoints # mqtt topic
+    topic_to: waypoints # Ros topic
