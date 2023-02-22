@@ -3,7 +3,7 @@
 __author__ = 'aivanovic'
 
 import rospy
-from geometry_msgs.msg import Pose, Twist
+from geometry_msgs.msg import Pose, Twist, PoseStamped, Vector3
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32, Header
 from sensor_msgs.msg import Imu, BatteryState
@@ -37,6 +37,15 @@ class GenerateUavState:
     rospy.Subscriber('generate_uav_state/battery_state', BatteryState,
       self.batteryStateCallback, queue_size=1)
 
+    # Reference as pose and velocity
+    self.pose_ref = PoseStamped()
+    rospy.Subscriber('carrot/pose', PoseStamped, self.poseRefCallback,
+      queue_size=1)
+
+    self.velocity_ref = Vector3()
+    rospy.Subscriber('carrot/velocity', PoseStamped, self.velocityRefCallback,
+      queue_size=1)
+
   def run(self):
     rate = rospy.Rate(self.rate)
     while not rospy.is_shutdown():
@@ -55,6 +64,10 @@ class GenerateUavState:
       self.uav_state.battery_percentage = (1 - 
         (self.voltage_max - self.battery_state.voltage)/(self.voltage_max - self.voltage_min))*100
 
+      # Position and velocity reference
+      self.uav_state.pose_ref = self.pose_ref.pose
+      self.uav_state.velocity_ref = self.velocity_ref
+
       # Append stamp
       self.uav_state.header.stamp = rospy.Time.now()
 
@@ -69,6 +82,12 @@ class GenerateUavState:
 
   def batteryStateCallback(self, msg):
     self.battery_state = msg
+
+  def poseRefCallback(self, msg):
+    self.pose_ref = msg
+
+  def velocityRefCallback(self, msg):
+    self.velocity_ref = msg
 
 
 if __name__ == '__main__':
