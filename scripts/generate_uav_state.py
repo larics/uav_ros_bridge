@@ -43,7 +43,7 @@ class GenerateUavState:
       queue_size=1)
 
     self.velocity_ref = Vector3()
-    rospy.Subscriber('carrot/velocity', PoseStamped, self.velocityRefCallback,
+    rospy.Subscriber('carrot/velocity', Vector3, self.velocityRefCallback,
       queue_size=1)
 
   def run(self):
