@@ -25,4 +25,12 @@
       <remap from="generate_uav_state/battery_state" to="mavros/battery"/>
     </node>
   </group>
+
+  <!-- Video streaming. The camera compressed topic can be accessed in the
+    browser with:
+    http://localhost:8080/stream?topic=/red/zed0/right/image_raw&type=ros_compressed-->
+  <node name="web_video_server" pkg="web_video_server" type="web_video_server" output="screen">
+    <param name="port" value="8080"/>
+    <param name="address" value="0.0.0.0"/>
+  </node>
 </launch>
