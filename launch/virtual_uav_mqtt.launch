@@ -27,7 +27,7 @@
     </node>
 
     <!-- Zbar qr code scanner -->
-    <node name="qr_code_reader" pkg="zbar_ros" type="barcode_reader_node">
+    <node name="qr_code_reader" pkg="zbar_ros" type="barcode_reader_node" output="screen">
       <remap from="image" to="$(arg qr_code_image)"/>
       <remap from="barcode" to="scanned_qr_code"/>
       <param name="throttle_repeated_barcodes" value="1.0"/>
