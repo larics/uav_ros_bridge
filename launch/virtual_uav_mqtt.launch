@@ -1,6 +1,7 @@
 <launch>
   <arg name="namespace" default="$(env UAV_NAMESPACE)"/>
   <arg name="mqtt_config_file" default="$(find uav_ros_bridge)/config/virtual_uav_mqtt_config.yaml"/>
+  <arg name="qr_code_image" default="/usb_cam/image_raw"/>
 
   <!-- The problem is with rosparam command that does not support environment
   variables in yaml files. The workaround creating copying the config file to .config.yaml and replacing string pattern "uav_unique_ns" with the 
@@ -23,6 +24,13 @@
       <remap from="generate_uav_state/odometry" to="es_ekf/odom"/>
       <remap from="generate_uav_state/imu" to="mavros/imu/data"/>
       <remap from="generate_uav_state/battery_state" to="mavros/battery"/>
+    </node>
+
+    <!-- Zbar qr code scanner -->
+    <node name="qr_code_reader" pkg="zbar_ros" type="barcode_reader_node">
+      <remap from="image" to="$(arg qr_code_image)"/>
+      <remap from="barcode" to="scanned_qr_code"/>
+      <param name="throttle_repeated_barcodes" value="1.0"/>
     </node>
   </group>
 

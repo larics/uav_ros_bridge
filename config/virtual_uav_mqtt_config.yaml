@@ -14,6 +14,11 @@ bridge:
     msg_type: uav_ros_bridge.msg:UavState
     topic_from: mqtt/state # Ros topic
     topic_to: uav_unique_namespace/state # mqtt topic
+  # Scanned qr code UAV --> HMI
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:String
+    topic_from: scanned_qr_code # Ros topic
+    topic_to: uav_unique_namespace/scanned_qr_code # mqtt topic
   # Takeoff HMI --> UAV
   - factory: mqtt_bridge.bridge:MqttToRosBridge
     msg_type: std_msgs.msg:Bool
@@ -24,7 +29,7 @@ bridge:
     msg_type: std_msgs.msg:Bool
     topic_from: uav_unique_namespace/land # mqtt topic
     topic_to: land # Ros topic
-  # Waypoints message (mission)
+  # Waypoints message (mission) HMI --> UAV
   - factory: mqtt_bridge.bridge:MqttToRosBridge
     msg_type: uav_ros_msgs.msg:Waypoints
     topic_from: uav_unique_namespace/waypoints # mqtt topic
