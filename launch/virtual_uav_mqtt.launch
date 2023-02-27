@@ -26,11 +26,14 @@
       <remap from="generate_uav_state/battery_state" to="mavros/battery"/>
     </node>
 
-    <!-- Zbar qr code scanner -->
+    <!-- Zbar qr code scanner. Image sub queue size is set to 1 since image
+    is processed in callback. Pub queue size is set to 10 if multiple qr codes are detected to publish them all. -->
     <node name="qr_code_reader" pkg="zbar_ros" type="barcode_reader_node" output="screen">
       <remap from="image" to="$(arg qr_code_image)"/>
       <remap from="barcode" to="scanned_qr_code"/>
       <param name="throttle_repeated_barcodes" value="1.0"/>
+      <param name="pub_queue_size" value="10"/>
+      <param name="sub_queue_size" value="1"/>
     </node>
   </group>
 
