@@ -15,10 +15,15 @@ ENV GIT_SSH_COMMAND="ssh -v"
 RUN --mount=type=ssh,id=default \
     mkdir -p ~/.ssh && ssh-keyscan -H github.com >> $HOME/.ssh/known_hosts
 
+# Install prerequisites
+RUN sudo apt update --fix-missing && \
+  sudo apt install nmap nano ros-noetic-rosbridge-library mosquitto mosquitto-clients
+RUN pip3 install inject paho-mqtt
+
 # Install uav_ros_bridge and its dependencies
 WORKDIR $HOME/$CATKIN_WORKSPACE/src
 RUN --mount=type=ssh id=default && \
-    git clone git@github.com:larics/mqtt_bridge.git --branch 0.1.7 && \
+    git clone git@github.com:larics/mqtt_bridge.git --branch master && \
     git clone git@github.com:larics/uav_ros_bridge.git
 RUN catkin build -c
 
