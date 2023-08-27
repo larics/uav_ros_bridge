@@ -1,0 +1,49 @@
+<launch>
+  <arg name="namespace" default="$(env UAV_NAMESPACE)"/>
+  <arg name="mqtt_config_file" default="$(find uav_ros_bridge)/startup/uav_sim_example/custom_config/uav_sim_example_mqtt_config.yaml"/>
+  <arg name="qr_code_image" default="/usb_cam/image_raw"/>
+
+  <!-- The problem is with rosparam command that does not support environment
+  variables in yaml files. The workaround creating copying the config file to .config.yaml and replacing string pattern "uav_unique_ns" with the 
+  UAV_NAMESPACE environment variable.
+
+  This script also load the rosparam. The reason is the rosparam below is loaded before the node is executed (setting the file for rosparam) so the
+  old .config.yaml file is loaded. -->
+  <node name="setup_mqtt_config_file" pkg="uav_ros_bridge" type="setup_mqtt_config_file.sh" output="screen" args="$(arg mqtt_config_file)"/>
+
+  <group ns="$(arg namespace)">
+    <node name="mqtt_bridge" pkg="mqtt_bridge" type="mqtt_bridge_node.py" output="screen" launch-prefix="bash -c 'sleep 5; $0 $@'; ">
+      <!--rosparam command="load" file="$(find uav_ros_bridge)/config/.config.yaml"/-->
+    </node>
+
+    <node name="generate_uav_state" pkg="uav_ros_bridge" type="generate_uav_state.py" output="screen">
+      <param name="rate" value="20"/>
+      <param name="voltage/min" value="50.4"/>
+      <param name="voltage/max" value="30.0"/>
+      <remap from="generate_uav_state/uav_state" to="mqtt/state"/>
+      <remap from="generate_uav_state/odometry" to="mavros/global_position/local"/>
+      <remap from="generate_uav_state/imu" to="mavros/imu/data"/>
+      <remap from="generate_uav_state/battery_state" to="mavros/battery"/>
+      <remap from="carrot/pose" to="carrot/pose"/>
+      <remap from="carrot/velocity" to="carrot/velocity"/>
+    </node>
+
+    <!-- Zbar qr code scanner. Image sub queue size is set to 1 since image
+    is processed in callback. Pub queue size is set to 10 if multiple qr codes are detected to publish them all. -->
+    <!--node name="qr_code_reader" pkg="zbar_ros" type="barcode_reader_node" output="screen">
+      <remap from="image" to="$(arg qr_code_image)"/>
+      <remap from="barcode" to="scanned_qr_code"/>
+      <param name="throttle_repeated_barcodes" value="1.0"/>
+      <param name="pub_queue_size" value="10"/>
+      <param name="sub_queue_size" value="1"/>
+    </node-->
+  </group>
+
+  <!-- Video streaming. The camera compressed topic can be accessed in the
+    browser with:
+    http://localhost:8080/stream?topic=/red/zed0/right/image_raw&type=ros_compressed-->
+  <!--node name="web_video_server" pkg="web_video_server" type="web_video_server" output="screen">
+    <param name="port" value="8080"/>
+    <param name="address" value="0.0.0.0"/>
+  </node-->
+</launch>

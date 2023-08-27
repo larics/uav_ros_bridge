@@ -25,3 +25,7 @@ windows:
       layout: tiled
       panes:
         - waitForRos; roslaunch uav_ros_tracker topp_tracker.launch
+  - mqtt:
+      layout: tiled
+      panes:
+        - waitForRos; sudo service mosquitto start; roslaunch uav_ros_bridge uav_sim_example_mqtt.launch
