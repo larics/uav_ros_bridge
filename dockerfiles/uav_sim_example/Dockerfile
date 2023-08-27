@@ -24,7 +24,9 @@ RUN pip3 install inject paho-mqtt
 WORKDIR $HOME/$CATKIN_WORKSPACE/src
 RUN --mount=type=ssh id=default && \
     git clone git@github.com:larics/mqtt_bridge.git --branch master && \
-    git clone git@github.com:larics/uav_ros_bridge.git
+    git clone git@github.com:larics/uav_ros_bridge.git && \
+    git@github.com:larics/web_video_server.git && \
+    git@github.com:larics/async_web_server_cpp.git --branch develop
 RUN catkin build -c
 
 # Prepare for startup and add autocomplete
