@@ -16,8 +16,8 @@ RUN --mount=type=ssh,id=default \
     mkdir -p ~/.ssh && ssh-keyscan -H github.com >> $HOME/.ssh/known_hosts
 
 # Install prerequisites
-RUN sudo apt update --fix-missing && \
-  sudo apt install nmap nano ros-noetic-rosbridge-library mosquitto mosquitto-clients
+RUN sudo apt update -y --fix-missing && \
+  sudo apt install -y nmap nano ros-noetic-rosbridge-library mosquitto mosquitto-clients
 RUN pip3 install inject paho-mqtt
 
 # Install uav_ros_bridge and its dependencies
@@ -25,8 +25,8 @@ WORKDIR $HOME/$CATKIN_WORKSPACE/src
 RUN --mount=type=ssh id=default && \
     git clone git@github.com:larics/mqtt_bridge.git --branch master && \
     git clone git@github.com:larics/uav_ros_bridge.git && \
-    git@github.com:larics/web_video_server.git && \
-    git@github.com:larics/async_web_server_cpp.git --branch develop
+    git clone git@github.com:larics/web_video_server.git && \
+    git clone git@github.com:larics/async_web_server_cpp.git --branch develop
 RUN catkin build -c
 
 # Prepare for startup and add autocomplete
