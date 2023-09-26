@@ -1,0 +1,36 @@
+mqtt:
+  client:
+    protocol: 4      # MQTTv311
+  connection:
+    host: localhost
+    port: 1883
+    keepalive: 60
+  private_path: device/001
+serializer: json:dumps
+deserializer: json:loads
+bridge:
+  # Uav state -> to HMI
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: uav_ros_bridge.msg:UavState
+    topic_from: mqtt/state # Ros topic
+    topic_to: uav_unique_namespace/state # mqtt topic
+  # Scanned qr code UAV --> HMI
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:String
+    topic_from: scanned_qr_code # Ros topic
+    topic_to: uav_unique_namespace/scanned_qr_code # mqtt topic
+  # Takeoff HMI --> UAV
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:Bool
+    topic_from: uav_unique_namespace/takeoff # mqtt topic
+    topic_to: takeoff # Ros topic
+  # Land HMI --> UAV
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:Bool
+    topic_from: uav_unique_namespace/land # mqtt topic
+    topic_to: land # Ros topic
+  # Waypoints message (mission) HMI --> UAV
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: uav_ros_msgs.msg:Waypoints
+    topic_from: uav_unique_namespace/waypoints # mqtt topic
+    topic_to: waypoints # Ros topic

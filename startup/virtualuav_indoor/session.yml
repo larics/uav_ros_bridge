@@ -1,0 +1,36 @@
+name: virtualuav_indoor
+root: ./
+startup_window: roscore
+pre_window: |
+  source custom_config/virtualuav_indoor_setup_rw.sh
+windows:
+  - roscore:
+      layout: tiled
+      panes:
+        - roscore
+        - waitForRos; roslaunch uav_ros_general apm2.launch fcu_url:=$PIX_SYM
+        - waitForRos; waitForMavros; sleep 10; rosrun mavros mavsys -n $UAV_NAMESPACE/mavros rate --all 50
+        - waitForRos; roslaunch uav_ros_general optitrack.launch object_name:=$OBJECT_NAME ip:=$OPTITRACK_IP    
+        - waitForRos; roslaunch uav_ros_general rc_to_joy.launch
+        - waitForRos; roslaunch realsense2_camera rs_rgbd.launch
+          camera:=$CAMERA_LINK
+  - arm&takeof:
+      layout: tiled
+      panes:
+        - waitForRos; roslaunch uav_ros_control pid_carrot.launch 
+          msf_callback_enable:=true
+          odometry:=$ODOM_TOPIC
+          control_type:=pid_cascade_node_yawrate
+          default_params:=$(rospack find uav_ros_control)/config/control/optitrack_position_control_falcon_thrust.params.yaml
+          carrot_config:=$(rospack find uav_ros_bridge)/startup/virtualuav_indoor/custom_config/carrot_config.yaml
+          carrot_frame_id:=$MAP_FRAME
+          carrot_land:=true
+        - history -s "waitForRos; roslaunch uav_ros_control uav_manager.launch odometry:=$ODOM_TOPIC"
+  - trajectory:
+      layout: tiled
+      panes:
+        - waitForRos; roslaunch uav_ros_tracker mpc_tracker.launch
+  - mqtt:
+      layout: tiled
+      panes:
+        - waitForRos; sudo service mosquitto start; roslaunch uav_ros_bridge virtualuav_indoor_mqtt.launch
