@@ -28,6 +28,15 @@
       <remap from="carrot/velocity" to="carrot/velocity"/>
     </node>
 
+    <node name="handle_mqtt_takeoff_land" pkg="uav_ros_bridge" type="handle_mqtt_takeoff_land.py" output="screen">
+      <remap from="handle_mqtt_takeoff_land/service/arm" to="mavros/cmd/arming"/>
+      <remap from="handle_mqtt_takeoff_land/service/takeoff" to="takeoff"/>
+      <remap from="handle_mqtt_takeoff_land/service/land" to="land"/>
+      <remap from="handle_mqtt_takeoff_land/takeoff" to="takeoff"/>
+      <remap from="handle_mqtt_takeoff_land/land" to="land"/>
+      <remap from="handle_mqtt_takeoff_land/arm" to="arm"/>
+    </node>
+
     <!-- Zbar qr code scanner. Image sub queue size is set to 1 since image
     is processed in callback. Pub queue size is set to 10 if multiple qr codes are detected to publish them all. -->
     <!--node name="qr_code_reader" pkg="zbar_ros" type="barcode_reader_node" output="screen">
