@@ -74,6 +74,10 @@ RUN curl https://raw.githubusercontent.com/IntelRealSense/librealsense/master/co
 WORKDIR $HOME/$CATKIN_WORKSPACE/src
 #RUN catkin build --continue-on-failure
 
+ARG ROS_HOSTNAME=localhost.local
+ARG ROS_MASTER_URI=http://localhost.local:11311
+ARG ROS_IP=localhost.local
+
 RUN echo " \
 export ROS_HOSTNAME=$ROS_HOSTNAME" >> $HOME/.bashrc
 RUN echo " \
