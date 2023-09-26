@@ -1,35 +1,7 @@
 #!/bin/bash
 
-# Challenge setup (maybe not relevant for arena)
-if [[ -z "${ARENA_TYPE}" ]]
-  then 
-    export ARENA_TYPE=1
-  fi;
-  if [[ $ARENA_TYPE -ge 6 ||  $ARENA_TYPE -le 0 ]]
-  then
-    echo "arena argument should be 1, 2 or 3. Defaulting to 1."
-    export ARENA_TYPE=1
-  fi;
-  if [ $ARENA_TYPE -eq 1 ]
-  then
-    export TILE_X=12.5
-    export TILE_Y=-3.0
-    export TILE_Z=2.0
-    export TILE_YAW=3.1415926
-  elif [ $ARENA_TYPE -eq 2 ]
-  then
-    export TILE_X=9.0
-    export TILE_Y=-7.5
-    export TILE_Z=2.5
-    export TILE_YAW=1.57079632679
-  elif [ $ARENA_TYPE -ge 3 ]
-  then
-    export TILE_X=7.5
-    export TILE_Y=7.5
-    export TILE_Z=3.5
-    export TILE_YAW=-1.57079632679
-  fi;
-
+IFACE=$(netstat -i | awk '{print $1}' | grep w)
+export UAV_IP=$(ifconfig $IFACE | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
 # Global Planner parameters
 #export ABSOLUTE_CONFIG=true
 #export MAP_CONFIG=$(rospack find icuas23_competition)/config/global_planner.yaml
@@ -61,3 +33,4 @@ export CAMERA_LINK=$UAV_NAMESPACE/camera
 export BASE_LINK=$UAV_NAMESPACE/base_link
 
 export TEAM_NAME=SDNCLAB
+

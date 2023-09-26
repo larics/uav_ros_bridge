@@ -1,5 +1,6 @@
 <launch>
   <arg name="namespace" default="$(env UAV_NAMESPACE)"/>
+  <arg name="uav_ip" default="$(env UAV_IP)"/>
   <arg name="mqtt_config_file" default="$(find uav_ros_bridge)/startup/virtualuav_indoor/custom_config/virtualuav_indoor_mqtt_config.yaml"/>
   <arg name="qr_code_image" default="/usb_cam/image_raw"/>
 
@@ -44,6 +45,6 @@
     http://localhost:8080/stream?topic=/red/zed0/right/image_raw&type=ros_compressed-->
   <node name="web_video_server" pkg="web_video_server" type="web_video_server" output="screen">
     <param name="port" value="8080"/>
-    <param name="address" value="0.0.0.0"/>
+    <param name="address" value="$(arg uav_ip)"/>
   </node>
 </launch>
