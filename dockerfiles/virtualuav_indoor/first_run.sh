@@ -44,5 +44,5 @@ docker run -it \
     --net=host \
     --privileged \
     --gpus all \
-    --name uav_sim_bridge_cont \
+    --name virtualuav_indoor_cont \
     virtualuav_indoor_img:latest
