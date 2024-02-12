@@ -3,6 +3,7 @@ root: ./
 startup_window: roscore
 pre_window: |
   source custom_config/virtualuav_indoor_setup_rw.sh
+attach: false
 windows:
   - roscore:
       layout: tiled
