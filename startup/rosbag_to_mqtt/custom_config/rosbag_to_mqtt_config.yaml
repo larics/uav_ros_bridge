@@ -1,0 +1,31 @@
+mqtt:
+  client:
+    protocol: 4      # MQTTv311
+  connection:
+    host: uav_unique_ip
+    port: 1883
+    keepalive: 60
+  private_path: device/001
+serializer: json:dumps
+deserializer: json:loads
+bridge:
+  # Odometry Placeholder
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: nav_msgs.msg:Odometry
+    topic_from: es_ekf/odom # ros topic
+    topic_to: uav_unique_namespace/odometry # mqtt topic
+  # Battery Placeholder
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: sensor_msgs.msg:BatteryState
+    topic_from: mavros/battery # ros topic
+    topic_to: uav_unique_namespace/battery # mqtt topic
+  # IMU Placeholder
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: sensor_msgs.msg:Imu
+    topic_from: mavros/imu/data # ros topic
+    topic_to: uav_unique_namespace/imu # mqtt topic
+  # Reference Placeholder
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: geometry_msgs.msg:PoseStamped
+    topic_from: carrot/pose # ros topic
+    topic_to: uav_unique_namespace/reference # mqtt topic
