@@ -1,0 +1,69 @@
+mqtt:
+  client:
+    protocol: 4      # MQTTv311
+  connection:
+    host: localhost
+    port: 1883
+    keepalive: 60
+  private_path: device/001
+serializer: json:dumps
+deserializer: json:loads
+bridge:
+  ##### OUTPUT ######
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: nav_msgs.msg:Odometry
+    topic_from: mavros/global_position/local # ros topic
+    topic_to: uav_unique_namespace/output/uav/odometry # mqtt topic
+  # Reference Placeholder
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: geometry_msgs.msg:PoseStamped
+    topic_from: carrot/pose # ros topic
+    topic_to: uav_unique_namespace/output/uav/reference # mqtt topic
+  # IMU Placeholder
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: sensor_msgs.msg:Imu
+    topic_from: mavros/imu/data # ros topic
+    topic_to: uav_unique_namespace/output/uav/imu # mqtt topic
+  # ris - matcher_score
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:Float64
+    topic_from: ris/matcher_score # ros topic
+    topic_to: uav_unique_namespace/output/inspection/matcher_score # mqtt topic
+  # ris - state
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:String
+    topic_from: ris/state # ros topic
+    topic_to: uav_unique_namespace/output/inspection/state # mqtt topic
+  # ris - completion
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:Float64
+    topic_from: ris/inspection_completion # ros topic
+    topic_to: uav_unique_namespace/output/inspection/progress # mqtt topic
+  # ris - distance to blade - TODO(not implemented)
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:Float64
+    topic_from: ris/distance_to_blade # ros topic
+    topic_to: uav_unique_namespace/output/inspection/distance_to_blade # mqtt topic
+    # ris - Blade info - TODO(not implemented, make a custom message)
+  - factory: mqtt_bridge.bridge:RosToMqttBridge
+    msg_type: std_msgs.msg:Float64
+    topic_from: ris/blade_info # ros topic
+    topic_to: uav_unique_namespace/output/inspection/blade_info # mqtt topic
+
+  ##### INPUT #####
+  # ris - Inspection info (height, length, distance, etc.) - TODO(not implemented, make a custom message)
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: geometry_msgs.msg:PoseStamped
+    topic_from: uav_unique_namespace/input/inspection/config # mqtt topic
+    topic_to: ris/config # Ros topic
+  # ris - start registration
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:Bool
+    topic_from: uav_unique_namespace/input/inspection/registration_request # mqtt topic
+    topic_to: ris/start_registration # Ros topic
+  # ris - start inspection
+  - factory: mqtt_bridge.bridge:MqttToRosBridge
+    msg_type: std_msgs.msg:Bool
+    topic_from: uav_unique_namespace/input/inspection/inspection_request # mqtt topic
+    topic_to: ris/start_inspection # Ros topic
+

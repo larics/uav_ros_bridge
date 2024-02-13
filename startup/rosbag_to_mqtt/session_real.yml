@@ -9,11 +9,11 @@ windows:
       layout: tiled
       panes:
         - roscore
-        - waitForRos; rosbag play --loop /root/test.bag
+        - waitForRos; rosbag play --loop /root/real.bag
   - mqtt:
       layout: tiled
       panes:
         - |
           waitForRos
           sudo service mosquitto start
-          roslaunch uav_ros_bridge mqtt.launch mqtt_config_file:=$(pwd)/custom_config/rosbag_to_mqtt_config.yaml
+          roslaunch uav_ros_bridge mqtt.launch mqtt_config_file:=$(pwd)/custom_config/rosbag_to_mqtt_real.yaml

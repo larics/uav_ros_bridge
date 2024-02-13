@@ -10,7 +10,11 @@ cd "$SCRIPTPATH"
 rm .tmuxinator.yml
 
 # link the session file to .tmuxinator.yml
-ln session.yml .tmuxinator.yml
+ln -f session.yml .tmuxinator.yml
+
+if [ "$1" = "real" ]; then
+  ln -f session_real.yml .tmuxinator.yml
+fi
 
 # start tmuxinator
 tmuxinator
