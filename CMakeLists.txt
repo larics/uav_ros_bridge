@@ -37,3 +37,21 @@ catkin_package(
   CATKIN_DEPENDS
   DEPENDS
 )
+
+# Mark launch folder for installation
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+# Mark config folder for installation
+install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+# Mark scripts folder for installation
+install(DIRECTORY scripts DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS)
+
+# Mark config folder for installation
+install(DIRECTORY startup DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  USE_SOURCE_PERMISSIONS)
+
+# Mark all the *.xml files for installation
+install(FILES package.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
