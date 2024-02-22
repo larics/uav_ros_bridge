@@ -14,7 +14,7 @@
   <node name="throttle_odometry" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg odometry) $(arg rate)" ns="$(arg namespace)"/>
 
   <!-- carrot throttle -->
-  <node name="throttle_odometry" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg reference) $(arg rate)" ns="$(arg namespace)"/>
+  <node name="throttle_carrot" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg reference) $(arg rate)" ns="$(arg namespace)"/>
 
   <!-- imu throttle -->
   <node name="throttle_imu" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg imu) $(arg rate)" ns="$(arg namespace)"/>
@@ -29,7 +29,7 @@
   <node name="throttle_completion" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg completion) $(arg rate)" ns="$(arg namespace)"/>
 
   <!-- distance throttle -->
-  <node name="throttle_completion" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg distance) $(arg rate)" ns="$(arg namespace)"/>
+  <node name="throttle_distance" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg distance) $(arg rate)" ns="$(arg namespace)"/>
 
   <!-- blade_info throttle -->
   <node name="throttle_blade_info" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg blade_info) $(arg rate)" ns="$(arg namespace)"/>
