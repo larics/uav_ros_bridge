@@ -1,0 +1,37 @@
+<launch>
+  <arg name="namespace"   value="$(env UAV_NAMESPACE)"/>
+  <arg name="rate"        value="2.0"/>
+  <arg name="odometry"    value="mavros/global_position/local"/>
+  <arg name="reference"   value="carrot/pose"/>
+  <arg name="imu"         value="mavros/imu/data"/>
+  <arg name="score"       value="ris/matcher_score"/>
+  <arg name="ris_state"   value="ris/state"/>
+  <arg name="completion"  value="ris/inspection_completion"/>
+  <arg name="distance"    value="ris/distance_to_blade"/>
+  <arg name="blade_info"  value="ris/blade_info"/>
+
+  <!-- Odometry throttle -->
+  <node name="throttle_odometry" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg odometry) $(arg rate)" ns="$(arg namespace)"/>
+
+  <!-- carrot throttle -->
+  <node name="throttle_odometry" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg reference) $(arg rate)" ns="$(arg namespace)"/>
+
+  <!-- imu throttle -->
+  <node name="throttle_imu" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg imu) $(arg rate)" ns="$(arg namespace)"/>
+
+  <!-- matcher_score throttle -->
+  <node name="throttle_matcher_score" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg score) $(arg rate)" ns="$(arg namespace)"/>
+
+  <!-- ris_state throttle -->
+  <node name="throttle_ris_state" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg ris_state) $(arg rate)" ns="$(arg namespace)"/>
+
+  <!-- completion throttle -->
+  <node name="throttle_completion" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg completion) $(arg rate)" ns="$(arg namespace)"/>
+
+  <!-- distance throttle -->
+  <node name="throttle_completion" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg distance) $(arg rate)" ns="$(arg namespace)"/>
+
+  <!-- blade_info throttle -->
+  <node name="throttle_blade_info" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg blade_info) $(arg rate)" ns="$(arg namespace)"/>
+
+</launch>
