@@ -1,6 +1,6 @@
 <launch>
   <arg name="namespace"   value="$(env UAV_NAMESPACE)"/>
-  <arg name="rate"        value="2.0"/>
+  <arg name="rate"        value="0.1"/>
   <arg name="odometry"    value="mavros/global_position/local"/>
   <arg name="reference"   value="carrot/pose"/>
   <arg name="imu"         value="mavros/imu/data"/>
