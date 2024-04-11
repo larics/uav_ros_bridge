@@ -8,7 +8,7 @@
   <arg name="ris_state"   value="ris/state"/>
   <arg name="completion"  value="ris/inspection_completion"/>
   <arg name="distance"    value="ris/distance_to_blade"/>
-  <arg name="blade_info"  value="ris/blade_info"/>
+  <arg name="blade_info"  value="ris/current_inspection_waypoint"/>
 
   <!-- Odometry throttle -->
   <node name="throttle_odometry" pkg="topic_tools" type="throttle" output="screen" args="messages $(arg odometry) $(arg rate)" ns="$(arg namespace)"/>
