@@ -7,8 +7,13 @@ import sys
 import threading
 import time
 
+import os
+
 import paho.mqtt.client as mqtt
 from check_util import FINAL_STATE_NAMES, check, finish, poll
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
+from drone_interface_mqtt_adapter import key_values  # noqa: E402
 
 port, prefix, renamed = int(sys.argv[1]), sys.argv[2], sys.argv[3] == "profile"
 messages = {}
@@ -47,6 +52,9 @@ client.loop_start()
 def send(payload):
     client.publish(prefix + "/command", payload if isinstance(payload, str) else json.dumps(payload), qos=1)
 
+
+converted = {kv.key: kv.value for kv in key_values({"on": True, "off": False, "n": 2.5, "s": "x"})}
+check("JSON booleans become true/false", converted == {"on": "true", "off": "false", "n": "2.5", "s": "x"}, converted)
 
 caps = wait("capabilities", 15)
 check("capabilities arrive", caps is not None)

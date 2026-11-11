@@ -60,8 +60,15 @@ def to_dict(message):
     return data
 
 
+def text(value):
+    """A JSON value as the drone interface reads it: booleans as true/false, not True/False."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
 def key_values(params):
-    return [KeyValue(key=str(k), value=str(v)) for k, v in (params or {}).items()]
+    return [KeyValue(key=str(k), value=text(v)) for k, v in (params or {}).items()]
 
 
 class Adapter:
