@@ -1,0 +1,12 @@
+host: "localhost"
+port: 1883
+prefix: ""                # empty = drone/<vehicle_id>
+vehicle_id: "vehicle"
+client_id: ""             # empty = the broker's choice
+status_rate: 2.0          # [Hz] <prefix>/status, the broker link is often slower than ROS
+workers: 4                # commands handled at once
+profile: ""               # yaml with renames for a client that brings its own format, see profiles/
+username: ""
+password: ""
+tls: false
+ca_certs: ""

@@ -1,0 +1,8 @@
+# Only for a client that brings its own MQTT format; the plain schema needs no profile.
+topics:                   # adapter name -> this client's name
+  status: telemetry
+fields:                   # per topic, field -> this client's field name
+  status:
+    flight_state_name: state
+subsets:                  # per topic, send only these fields (names before the rename)
+  status: [flight_state_name, armed, position, battery, warnings]

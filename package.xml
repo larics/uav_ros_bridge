@@ -30,6 +30,7 @@
   <!-- Dependencies can be catkin packages or system dependencies -->
   <!-- Examples: -->
   <!-- Use build_depend for packages you need at compile time: -->
+  <test_depend>uav_ros_general</test_depend><!-- check_util.py of the drone interface checks -->
   <build_depend>message_generation</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
@@ -38,6 +39,8 @@
   <build_depend>trajectory_msgs</build_depend>
   <build_depend>nav_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>uav_ros_msgs</build_depend>
+  <build_depend>diagnostic_msgs</build_depend>
   <!-- build_depend>arducopter_trajectory_planner</build_depend-->
   <!-- Use buildtool_depend for build tool packages: -->
   <!--   <buildtool_depend>catkin</buildtool_depend> -->
@@ -50,6 +53,8 @@
   <run_depend>trajectory_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
+  <run_depend>uav_ros_msgs</run_depend>
+  <run_depend>diagnostic_msgs</run_depend>
   <!-- run_depend>arducopter_trajectory_planner</run_depend -->
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
