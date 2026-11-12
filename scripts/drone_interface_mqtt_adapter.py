@@ -77,6 +77,7 @@ class Adapter:
         self.prefix = config["prefix"] or "drone/" + config.get("vehicle_id", "vehicle")
         self.status_period = 1.0 / config["status_rate"]
         self.last_status = 0.0
+        self.capabilities = None  # the latest, sent again on every (re)connect
         self.profile = self.load_profile(config.get("profile", ""))
         self.pool = ThreadPoolExecutor(max_workers=config["workers"])
 
@@ -96,8 +97,7 @@ class Adapter:
 
         rospy.Subscriber("drone/status", DroneStatus, self.on_status, queue_size=1)
         rospy.Subscriber("drone/health", DiagnosticComponentArray, self.forward("health"), queue_size=1)
-        rospy.Subscriber("drone/capabilities", DroneCapabilities,
-                         self.forward("capabilities", retain=True), queue_size=1)
+        rospy.Subscriber("drone/capabilities", DroneCapabilities, self.on_capabilities, queue_size=1)
         rospy.Subscriber("drone/command_status", DroneCommandStatus,
                          self.forward("command_status", qos=QOS_RELIABLE), queue_size=50)
         rospy.Subscriber("drone/camera/image", CompressedImage, self.on_image, queue_size=1, buff_size=2 ** 24)
@@ -135,6 +135,10 @@ class Adapter:
             self.last_status = now
             self.publish("status", status)
 
+    def on_capabilities(self, capabilities):
+        self.capabilities = capabilities
+        self.publish("capabilities", capabilities, retain=True)
+
     def on_image(self, image):
         self.client.publish(self.topic("camera/jpeg"), bytes(image.data), qos=QOS_FAST, retain=True)
 
@@ -143,6 +147,10 @@ class Adapter:
             rospy.logerr("[mqtt adapter] broker refused the connection: %d", result)
             return
         client.subscribe(self.topic("command"), qos=QOS_RELIABLE)
+        # Retained, but a broker without persistence forgets it on a restart, and the first one
+        # can arrive from ROS before the connection is up and be dropped.
+        if self.capabilities is not None:
+            self.publish("capabilities", self.capabilities, retain=True)
         rospy.loginfo("[mqtt adapter] connected")
 
     def on_message(self, _client, _userdata, message):

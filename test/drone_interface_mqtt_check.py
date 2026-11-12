@@ -15,7 +15,8 @@ from check_util import FINAL_STATE_NAMES, check, finish, poll
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
 from drone_interface_mqtt_adapter import key_values  # noqa: E402
 
-port, prefix, renamed = int(sys.argv[1]), sys.argv[2], sys.argv[3] == "profile"
+port, prefix, mode = int(sys.argv[1]), sys.argv[2], sys.argv[3]
+renamed = mode == "profile"
 messages = {}
 lock = threading.Lock()
 
@@ -55,6 +56,22 @@ def send(payload):
 
 converted = {kv.key: kv.value for kv in key_values({"on": True, "off": False, "n": 2.5, "s": "x"})}
 check("JSON booleans become true/false", converted == {"on": "true", "off": "false", "n": "2.5", "s": "x"}, converted)
+
+if mode == "restart":
+    # The broker was restarted without persistence: nothing retained is left but what the
+    # adapter sends again when it reconnects.
+    check("capabilities are sent again after a broker restart", wait("capabilities", 40) is not None)
+    # Live delivery clears the retain flag; a client that subscribes now must get them retained.
+    late, kept = mqtt.Client(), []
+    late.on_message = lambda _c, _u, message: kept.append(message)
+    late.on_connect = lambda c, *_: c.subscribe(prefix + "/capabilities", qos=1)
+    late.connect("localhost", port)
+    late.loop_start()
+    check("and retained for a client that comes later",
+          poll(lambda: kept[0] if kept else None, 5, 0.05) is not None and kept[0].retain)
+    late.loop_stop()
+    client.loop_stop()
+    finish()
 
 caps = wait("capabilities", 15)
 check("capabilities arrive", caps is not None)

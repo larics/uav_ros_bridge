@@ -1,6 +1,6 @@
 #!/bin/bash
 # The MQTT adapter with the fake backend and a local mosquitto, no simulator: once with the
-# plain schema, once with the example profile.
+# plain schema, once with the example profile, then across a broker restart.
 #   test/drone_interface_mqtt_check.sh
 HERE=$(dirname "$(readlink -f "$0")")
 PKG=$(readlink -f "$HERE/..")
@@ -25,4 +25,10 @@ roslaunch uav_ros_bridge drone_interface_mqtt_adapter.launch port:=$PORT \
   profile:="$PKG/config/drone_interface/profiles/example.yaml" > /tmp/drone_interface_mqtt_adapter2.log 2>&1 &
 ADAPTER=$!
 python3 "$HERE/drone_interface_mqtt_check.py" $PORT drone/vehicle profile
+RESULT=$((RESULT + $?))
+# A broker without persistence forgets the retained capabilities when it restarts
+kill $BROKER; wait $BROKER 2>/dev/null
+mosquitto -p $PORT > /dev/null 2>&1 &
+BROKER=$!
+python3 "$HERE/drone_interface_mqtt_check.py" $PORT drone/vehicle restart
 exit $((RESULT + $?))
