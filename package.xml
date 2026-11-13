@@ -54,6 +54,7 @@
   <run_depend>nav_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>uav_ros_msgs</run_depend>
+  <run_depend>uav_ros_lib</run_depend><!-- ros_json, the JSON of the messages -->
   <run_depend>diagnostic_msgs</run_depend>
   <!-- run_depend>arducopter_trajectory_planner</run_depend -->
   <!-- Use test_depend for packages you need only for testing: -->

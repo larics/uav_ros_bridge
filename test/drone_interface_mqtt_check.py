@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """Checks the running MQTT adapter from the broker side. Started by
-drone_interface_mqtt_check.sh with the fake backend; prints PASS or FAIL per check. The shared
-helpers come from uav_ros_general's test/drone_interface/check_util.py, on PYTHONPATH."""
+drone_interface_mqtt_check.sh with the fake backend and its camera media; prints PASS or FAIL
+per check. The shared helpers come from uav_ros_general's test/drone_interface/check_util.py,
+on PYTHONPATH."""
 import json
+import os
 import sys
 import threading
 import time
 
-import os
-
 import paho.mqtt.client as mqtt
 from check_util import FINAL_STATE_NAMES, check, finish, poll
+from uav_ros_msgs.msg import DronePhoto
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
 from drone_interface_mqtt_adapter import key_values  # noqa: E402
@@ -98,6 +99,17 @@ send({"id": "t1", "type": "land"})
 check("rejection comes back", (final("t1") or {}).get("reason") == "not in the air", states("t1"))
 send({"id": "t2", "type": "takeoff", "params": {"altitude": 10}})
 check("takeoff succeeds", (final("t2") or {}).get("state_name") == "SUCCEEDED", states("t2"))
+check("result is an object, empty without one", (final("t2") or {}).get("result") == {}, final("t2"))
+send({"id": "f1", "type": "photo"})
+taken = final("f1") or {}
+result = taken.get("result") or {}
+check("photo succeeds with photo_id and url in result",
+      taken.get("state_name") == "SUCCEEDED" and set(result) == {"photo_id", "url"}, taken)
+message = wait("camera/photo", pred=lambda m: json.loads(m.payload)["id"] == result.get("photo_id"))
+check("camera/photo arrives with the id of the result", message is not None, messages.get("camera/photo"))
+photo = json.loads(message.payload) if message else {}
+check("camera/photo is QoS 1 and not retained", message is not None and message.qos == 1 and not message.retain)
+check("camera/photo carries the DronePhoto fields", set(photo) == set(DronePhoto.__slots__), sorted(photo))
 send({"id": "t2", "type": "takeoff", "params": {"altitude": 10}})
 time.sleep(1)
 check("a duplicate does not run again", [s["state_name"] for s in states("t2")].count("RUNNING") >= 1
