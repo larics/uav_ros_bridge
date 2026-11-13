@@ -7,13 +7,16 @@ and formats; what the drone can do is decided behind drone/command.
     <prefix>/capabilities    out, retained
     <prefix>/command_status  out, QoS 1
     <prefix>/camera/jpeg     out, raw JPEG bytes, retained
+    <prefix>/camera/photo    out, QoS 1, a DronePhoto; the picture itself is fetched from its url
     <prefix>/command         in, QoS 1
 
-A command is the DroneCommand message as JSON, with `params` as an object. Waypoints of its
-mission are {latitude, longitude, altitude, altitude_reference, heading}, never poses: the
-adapter passes them on in the mission manager's lat/lon frames, which converts them, and does
-no geodesy of its own. MQTT can deliver a command twice, which is harmless: the core runs a
-known id only once.
+Messages go out as uav_ros_lib's to_dict gives them: the ROS fields, times in seconds,
+KeyValue lists (a command status' result) as objects, unknown numbers null. A command is the
+DroneCommand message as JSON, with `params` as an object. Waypoints of its mission are
+{latitude, longitude, altitude, altitude_reference, heading}, never poses: the adapter passes
+them on in the mission manager's lat/lon frames, which converts them, and does no geodesy of
+its own. MQTT can deliver a command twice, which is harmless: the core runs a known id only
+once.
 """
 import json
 import math
@@ -24,8 +27,9 @@ import rospy
 import yaml
 from diagnostic_msgs.msg import KeyValue
 from sensor_msgs.msg import CompressedImage
+from uav_ros_lib.ros_json import to_dict
 from uav_ros_msgs.msg import (DiagnosticComponentArray, DroneCapabilities, DroneCommand,
-                              DroneCommandStatus, DroneStatus, GeoPose, Mission, MissionAction,
+                              DroneCommandStatus, DronePhoto, DroneStatus, Mission, MissionAction,
                               MissionWaypoint)
 from geometry_msgs.msg import PoseStamped, Quaternion
 from uav_ros_msgs.srv import SendDroneCommand
@@ -34,30 +38,9 @@ QOS_FAST, QOS_RELIABLE = 0, 1
 # Rejections the core answers without an entry, so drone/command_status never carries them
 # (reasons in command_manager.cpp).
 UNPUBLISHED_REJECTIONS = {"missing id", "id reused"}
-ALTITUDE_REFERENCES = {"AMSL": GeoPose.AMSL, "ABOVE_TAKEOFF": GeoPose.ABOVE_TAKEOFF,
-                       "ABOVE_GROUND": GeoPose.ABOVE_GROUND}
-ALTITUDE_NAMES = {value: name for name, value in ALTITUDE_REFERENCES.items()}
 # The mission manager's geodetic frames (uav_ros_lib geo_frame.hpp): x = latitude,
 # y = longitude, z = altitude in the frame's reference.
 WAYPOINT_FRAMES = {"AMSL": "latlon_origin", "ABOVE_TAKEOFF": "latlon_above_takeoff"}
-
-
-def to_dict(message):
-    """A ROS message as JSON-safe data: KeyValue lists become objects, unknown numbers null."""
-    if hasattr(message, "to_sec"):
-        return message.to_sec()
-    if isinstance(message, float):
-        return message if math.isfinite(message) else None
-    if isinstance(message, (list, tuple)):
-        if message and isinstance(message[0], KeyValue):
-            return {kv.key: kv.value for kv in message}
-        return [to_dict(item) for item in message]
-    if not hasattr(message, "__slots__"):
-        return message
-    data = {slot: to_dict(getattr(message, slot)) for slot in message.__slots__}
-    if isinstance(message, GeoPose):
-        data["altitude_reference_name"] = ALTITUDE_NAMES.get(message.altitude_reference, "")
-    return data
 
 
 def text(value):
@@ -101,6 +84,8 @@ class Adapter:
         rospy.Subscriber("drone/command_status", DroneCommandStatus,
                          self.forward("command_status", qos=QOS_RELIABLE), queue_size=50)
         rospy.Subscriber("drone/camera/image", CompressedImage, self.on_image, queue_size=1, buff_size=2 ** 24)
+        rospy.Subscriber("drone/camera/photo", DronePhoto,
+                         self.forward("camera/photo", qos=QOS_RELIABLE), queue_size=10)
         rospy.loginfo("[mqtt adapter] %s on %s:%d", self.prefix, config["host"], config["port"])
 
     @staticmethod

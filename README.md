@@ -42,6 +42,19 @@ orientation:
 
 
 
+## Drone interface over MQTT
+`scripts/drone_interface_mqtt_adapter.py` mirrors the drone interface (`drone/...` in the UAV namespace) as JSON on an MQTT broker, under `drone/<vehicle_id>` (the adapter's own `vehicle_id` param, default `vehicle`):
+
+- `status`, `health`, `capabilities` (retained) and `command_status` (QoS 1); a command status carries `result`, an object with what a `SUCCEEDED` command hands back (`photo_id` and `url` of a `photo`, `parameters` of a `camera_set_parameters`), `{}` for most;
+- `camera/jpeg`: the preview, raw JPEG bytes, retained;
+- `camera/photo`: one JSON message per photo taken (QoS 1, not retained). The picture itself is not sent over MQTT: fetch it over HTTP from its `url`;
+- `command`: the commands, in.
+
+```bash
+roslaunch uav_ros_bridge drone_interface_mqtt_adapter.launch host:=localhost port:=1883
+test/drone_interface_mqtt_check.sh    # the adapter with the fake backend, its fake camera and a local mosquitto
+```
+
 ## Video streaming
 Install following packages to use the video stream:
 
